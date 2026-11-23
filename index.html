@@ -1,251 +1,576 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#130d24">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>LOVE ESCAPE ❤️</title>
+
 <style>
-:root{--pink:#ff6da9;--purple:#241737;--cream:#fff2e5}
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#100b1e;color:white;font-family:system-ui,"Noto Sans Bengali",sans-serif;touch-action:none}
-#gameShell{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 20%,#342047,#100b1e 75%);overflow:hidden}
-#stage{position:relative;width:min(100vw,177.777vh);height:min(100vh,56.25vw);aspect-ratio:16/9;display:flex;flex-direction:column;gap:8px;padding:10px 14px 12px}
-#topbar{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.brand{font-size:clamp(15px,2.8vw,25px);font-weight:900;letter-spacing:1px;color:#ff86b8;text-shadow:0 2px 15px #ff4b9c55}
-.stats{display:flex;gap:8px;align-items:center}
-.pill{background:#ffffff17;border:1px solid #ffffff24;border-radius:30px;padding:6px 13px;font-weight:800;font-size:clamp(11px,1.8vw,16px);white-space:nowrap}
-#canvasWrap{position:relative;flex:1;min-height:0;border:4px solid #9e628f;border-radius:20px;overflow:hidden;background:#8dd4df;box-shadow:0 0 0 2px #ffffff1c,0 12px 35px #0008}
-canvas{display:block;width:100%;height:100%}
-#controls{height:clamp(48px,11vh,76px);flex:none;display:flex;align-items:stretch;justify-content:center;gap:12px}
-.control{flex:1;max-width:240px;border:2px solid #a778a4;border-radius:18px;background:linear-gradient(145deg,#493054,#2b1d3d);color:white;font-size:clamp(14px,2.4vw,21px);font-weight:900;letter-spacing:1px;box-shadow:0 5px 0 #171023;touch-action:none}
-.control:active{transform:translateY(3px);box-shadow:0 2px 0 #171023;background:#68416b}
-#hint{height:18px;flex:none;text-align:center;color:#d5c4dc;font-size:clamp(9px,1.6vw,13px);white-space:nowrap}
-#rotateBtn{position:absolute;right:14px;top:58px;z-index:5;border:1px solid #ffffff55;border-radius:30px;background:#1c142dcc;color:white;padding:7px 12px;font-weight:800;font-size:12px}
-#overlay{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;background:#10091dcc;padding:14px}
-.panel{width:min(560px,94%);max-height:95%;overflow:auto;text-align:center;border:2px solid #b879a9;border-radius:22px;background:linear-gradient(145deg,#392344f5,#21152ff5);padding:clamp(12px,3vw,26px);box-shadow:0 18px 50px #0008}
-.panel h1{margin:0 0 8px;color:#ff8dbb;font-size:clamp(22px,5vw,42px)}
-.panel p{margin:8px 0;color:#fff0f7;font-size:clamp(12px,2vw,17px);line-height:1.6}
-.mainBtn{border:0;border-radius:30px;background:linear-gradient(90deg,#ff5b9e,#ff9bc3);color:#48182f;padding:12px 28px;font-weight:1000;font-size:clamp(14px,2.4vw,20px);margin-top:8px}
-#toast{position:absolute;left:50%;top:18%;transform:translateX(-50%);z-index:3;background:#24152fe8;border:1px solid #ff9ac7;border-radius:25px;padding:8px 16px;font-weight:900;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
-.hidden{display:none!important}
-#portraitNotice{display:none;position:fixed;inset:0;z-index:20;background:#100b1e;color:white;align-items:center;justify-content:center;text-align:center;padding:28px;touch-action:manipulation}
-#portraitNotice .mainBtn{cursor:pointer}
-#portraitNotice .box{max-width:360px}
-@media (orientation:portrait) and (max-width:700px){
-  #stage{width:100vw;height:100vh;aspect-ratio:auto;padding:8px}
-  #canvasWrap{min-height:0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+ background:#142137;color:white;
+ font-family:Arial,sans-serif;overflow:hidden;
 }
-#gameShell.manualRotate #stage{position:absolute;left:50%;top:50%;width:100vh;height:100vw;max-width:none;max-height:none;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center}
-#gameShell.manualRotate{overflow:hidden}
-#gameShell.manualRotate #portraitNotice{display:none!important}
-@media (max-height:380px){#stage{padding:5px 9px;gap:4px}#topbar{height:30px}#controls{height:42px}#hint{height:12px}#rotateBtn{top:39px}}
+header{
+ height:48px;display:flex;align-items:center;
+ justify-content:space-between;padding:0 14px;
+ background:#202d42;
+}
+header h2{color:#ff8bb9;font-size:19px}
+#info{font-size:12px;color:#ffc4dd}
+#stage{
+ width:100vw;height:calc(100dvh - 105px);
+ display:flex;align-items:center;justify-content:center;
+}
+canvas{
+ width:100%;height:100%;object-fit:contain;
+}
+.controls{
+ height:57px;background:#202d42;
+ display:flex;align-items:center;
+ justify-content:center;gap:9px;
+}
+button{
+ border:0;border-radius:25px;padding:11px 17px;
+ background:#ed5594;color:white;
+ font-weight:bold;font-size:14px;
+}
+#musicBtn{background:#546b9b}
 </style>
 </head>
+
 <body>
-<div id="gameShell">
-  <div id="stage">
-    <div id="topbar">
-      <div class="brand">LOVE ESCAPE ❤️</div>
-      <div class="stats">
-        <div class="pill">💗 <span id="loveCount">0</span>/15</div>
-        <div class="pill">🏃 <span id="roundCount">১</span> রাউন্ড</div>
-      </div>
-    </div>
-    <button id="rotateBtn" type="button">⟳ ROTATE / FULLSCREEN</button>
-    <div id="canvasWrap"><canvas id="game" width="960" height="540"></canvas><div id="toast"></div>
-      <div id="overlay">
-        <div class="panel">
-          <h1>LOVE ESCAPE! 💘</h1>
-          <p>ছেলেটা ফুল আর চকোলেট নিয়ে পালাচ্ছে! 🌹🍫<br>মেয়ে পেছন থেকে ঝাড়ু হাতে ধাওয়া করছে! 😂</p>
-          <p><b>তুমি মেয়েকে নিয়ন্ত্রণ করবে।</b><br>১৫টি Love সংগ্রহ করলেই ধরে ফেলবে। তারপর ৩ সেকেন্ড ঝাড়ু দিয়ে পিটুনি! 😄</p>
-          <button class="mainBtn" id="startBtn">খেলা শুরু করো ❤️</button>
-        </div>
-      </div>
-    </div>
-    <div id="controls">
-      <button class="control" id="jumpBtn">⬆ JUMP</button>
-      <button class="control" id="duckBtn">⬇ DUCK</button>
-    </div>
-    <div id="hint">মেয়েকে নিয়ন্ত্রণ করো • Jump = লাফ • Duck = নিচু হও • ১৫টি Love সংগ্রহ করো</div>
-  </div>
+
+<header>
+<h2>❤️ LOVE ESCAPE</h2>
+<span id="info">READY!</span>
+</header>
+
+<div id="stage">
+<canvas id="game" width="960" height="540"></canvas>
 </div>
-<div id="portraitNotice"><div class="box"><div style="font-size:54px">📱 ↻</div><h2>Landscape Mode</h2><p>গেমটি বড় স্ক্রিনে খেলার জন্য নিচের বাটনে চাপ দাও। ফোন ঘোরানো না গেলেও স্ক্রিন ঘুরিয়ে দেখানোর চেষ্টা করবে।</p><button class="mainBtn" id="portraitRotateBtn">⟳ স্ক্রিন ঘোরাও</button></div></div>
+
+<div class="controls">
+<button onclick="startGame()">▶ START</button>
+<button onclick="resetGame()">↻ RESET</button>
+<button id="musicBtn" onclick="toggleMusic()">🔊 MUSIC</button>
+</div>
+
 <script>
-(()=>{
-'use strict';
-const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
-const W=960,H=540,ground=435;
-const boyImg=new Image(),girlImg=new Image();
-boyImg.src='boy.png';girlImg.src='girl.png';
-let running=false,started=false,phase='chase',love=0,round=1,world=0,last=0,spawn=0,obSpawn=0,hitTimer=0,toastTimer=0;
-let musicOn=false,audio=null,musicTimer=null,musicStep=0;
-const girl={x:170,y:ground-140,w:100,h:140,vy:0,jumping:false,duck:false,frame:0};
-const boy={x:670,y:ground-142,w:105,h:142,frame:0};
-let loves=[],obstacles=[],particles=[];
-const $=id=>document.getElementById(id);
-function fit(){ /* canvas uses a fixed logical landscape size and scales via CSS */ }
-let manualLandscape=false;
-function resizeNotice(){
-  const portrait=innerHeight>innerWidth && innerWidth<700;
-  $('portraitNotice').style.display=(portrait&&!manualLandscape)?'flex':'none';
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+const girl=new Image();
+const boy=new Image();
+girl.src="girl.png";
+boy.src="boy.png";
+
+let running=false;
+let attacking=false;
+let frame=0;
+let lastTime=0;
+let world=0;
+
+let hearts=0;
+let totalCatches=0;
+let attackStart=0;
+let attackDuration=3;
+
+let nextHeart=0;
+let heartX=960;
+let heartY=260;
+let heartActive=false;
+
+let particles=[];
+let audioCtx=null;
+let musicOn=true;
+let musicTimer=null;
+let melodyStep=0;
+
+const girlX=390;
+const boyX=690;
+
+// ---------------- AUDIO SYSTEM ----------------
+
+function audioReady(){
+ if(!audioCtx){
+  audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+ }
+ if(audioCtx.state==="suspended")audioCtx.resume();
 }
-window.addEventListener('resize',resizeNotice);
-window.addEventListener('orientationchange',()=>setTimeout(resizeNotice,250));
-resizeNotice();
-function roundedRect(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}}
-function drawCloud(x,y,s){ctx.fillStyle='#ffffffa8';ctx.beginPath();ctx.arc(x,y,24*s,0,Math.PI*2);ctx.arc(x+25*s,y-10*s,30*s,0,Math.PI*2);ctx.arc(x+55*s,y,22*s,0,Math.PI*2);ctx.fill()}
-function drawTree(x,y,s){ctx.fillStyle='#76503b';ctx.fillRect(x-7*s,y,14*s,90*s);ctx.fillStyle='#26794f';ctx.beginPath();ctx.arc(x,y-12*s,42*s,0,Math.PI*2);ctx.arc(x-22*s,y+2*s,28*s,0,Math.PI*2);ctx.arc(x+25*s,y+3*s,28*s,0,Math.PI*2);ctx.fill();ctx.fillStyle='#49a66d';ctx.beginPath();ctx.arc(x-13*s,y-25*s,15*s,0,Math.PI*2);ctx.fill()}
-function background(){
- const t=world;
- const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#68c6e5');sky.addColorStop(.58,'#c7e9df');sky.addColorStop(1,'#f4d1a7');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
- // Warm sun glow and soft rays.
- const glow=ctx.createRadialGradient(805,92,8,805,92,150);glow.addColorStop(0,'#fff8cf88');glow.addColorStop(1,'#fff8cf00');ctx.fillStyle=glow;ctx.fillRect(650,0,310,250);
- ctx.fillStyle='#fff0a6';ctx.beginPath();ctx.arc(805,92,43,0,Math.PI*2);ctx.fill();
- drawCloud(130-(t*.12%1150),100,.9);drawCloud(550-(t*.08%1100),145,.7);drawCloud(930-(t*.1%1100),80,.8);
- // Distant rolling hills move slowly for depth.
- ctx.fillStyle='#a4c9a8';ctx.beginPath();ctx.moveTo(0,330);for(let x=0;x<=W;x+=60)ctx.lineTo(x,300+Math.sin((x+t*.045)*.008)*22);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();
- ctx.fillStyle='#80b597';ctx.beginPath();ctx.moveTo(0,365);for(let x=0;x<=W;x+=65)ctx.lineTo(x,340+Math.sin((x+t*.075)*.01)*18);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();
- for(let i=0;i<8;i++){let x=((i*175-t*.32)%(W+200)+W+200)%(W+200)-80;drawTree(x,340,1.02)}
- // Roadside fence posts in the middle distance.
- ctx.strokeStyle='#c6a27d';ctx.lineWidth=5;for(let i=0;i<9;i++){let x=((i*145-t*.55)%(W+160)+W+160)%(W+160);ctx.beginPath();ctx.moveTo(x,375);ctx.lineTo(x,420);ctx.stroke()}
- ctx.fillStyle='#9b6b53';ctx.fillRect(0,ground,W,H-ground);
- ctx.fillStyle='#d89d77';ctx.fillRect(0,ground,W,10);
- // Textured road surface.
- for(let i=0;i<28;i++){let x=((i*47-t*.8)%(W+60)+W+60)%(W+60);ctx.fillStyle='#7e5548';ctx.globalAlpha=.18;ctx.beginPath();ctx.ellipse(x,520,12,2,0,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
- ctx.strokeStyle='#714a42';ctx.lineWidth=4;ctx.setLineDash([48,38]);ctx.lineDashOffset=-t*.9;ctx.beginPath();ctx.moveTo(0,490);ctx.lineTo(W,490);ctx.stroke();ctx.setLineDash([]);
- for(let i=0;i<10;i++){let x=((i*120-t*.7)%(W+100)+W+100)%(W+100);ctx.fillStyle=i%2?'#398c58':'#4c9e5e';ctx.beginPath();ctx.arc(x,425,13,0,Math.PI*2);ctx.fill()}
+
+function tone(freq,duration,type="sine",volume=.08){
+ if(!audioCtx)return;
+
+ const osc=audioCtx.createOscillator();
+ const gain=audioCtx.createGain();
+
+ osc.type=type;
+ osc.frequency.setValueAtTime(freq,audioCtx.currentTime);
+
+ gain.gain.setValueAtTime(volume,audioCtx.currentTime);
+ gain.gain.exponentialRampToValueAtTime(
+  .001,audioCtx.currentTime+duration
+ );
+
+ osc.connect(gain);
+ gain.connect(audioCtx.destination);
+
+ osc.start();
+ osc.stop(audioCtx.currentTime+duration);
 }
-function drawFallback(x,y,w,h,isGirl){
- ctx.save();ctx.translate(x,y);ctx.fillStyle=isGirl?'#126b4b':'#394b65';ctx.beginPath();ctx.arc(w*.5,20,w*.18,0,Math.PI*2);ctx.fill();ctx.fillRect(w*.3,40,w*.4,h*.48);ctx.strokeStyle='#222';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(w*.4,h*.48);ctx.lineTo(w*.25,h*.9);ctx.moveTo(w*.6,h*.48);ctx.lineTo(w*.75,h*.9);ctx.stroke();ctx.restore();
+
+function playCollect(){
+ if(!audioCtx)return;
+ tone(660,.12,"sine",.09);
+ setTimeout(()=>tone(880,.18,"sine",.07),90);
 }
-function drawCharacter(img,obj,isGirl){
- const t=world;
- const runningBob=Math.sin(t*.23+(isGirl?0:1.2));
- const stride=Math.sin(t*.34+(isGirl?0:1.5));
- const ducking=isGirl&&obj.duck;
- const bob=ducking?7:Math.abs(runningBob)*7;
- const lean=isGirl?-.045+stride*.018:-.075+stride*.025;
- const cx=obj.x+obj.w/2, baseY=ground;
- // Soft moving contact shadow makes the run feel grounded.
+
+function playBonk(){
+ if(!audioCtx)return;
+ tone(125,.18,"square",.12);
+ setTimeout(()=>tone(75,.2,"triangle",.1),100);
+}
+
+function playCatch(){
+ if(!audioCtx)return;
+ tone(440,.15,"sine",.09);
+ setTimeout(()=>tone(330,.18,"sine",.08),120);
+}
+
+function playEscape(){
+ if(!audioCtx)return;
+ tone(523,.12,"sine",.08);
+ setTimeout(()=>tone(659,.14,"sine",.08),100);
+}
+
+const melody=[
+ 392,523,587,523,
+ 440,523,659,587,
+ 392,440,523,440,
+ 349,440,523,392
+];
+
+function musicLoop(){
+ if(!audioCtx || !musicOn || !running)return;
+
+ const note=melody[melodyStep%melody.length];
+ tone(note,.28,"triangle",.035);
+
+ if(melodyStep%4===0){
+  tone(note/2,.4,"sine",.025);
+ }
+
+ melodyStep++;
+ musicTimer=setTimeout(musicLoop,330);
+}
+
+function startMusic(){
+ audioReady();
+ if(!musicOn || !running)return;
+ clearTimeout(musicTimer);
+ melodyStep=0;
+ musicLoop();
+}
+
+function stopMusic(){
+ clearTimeout(musicTimer);
+}
+
+function toggleMusic(){
+ musicOn=!musicOn;
+ document.getElementById("musicBtn").textContent=
+ musicOn?"🔊 MUSIC":"🔇 MUSIC";
+
+ if(musicOn && running)startMusic();
+ else stopMusic();
+}
+
+// ---------------- BACKGROUND ----------------
+
+function background(dt){
+ world+=dt;
+
+ let sky=ctx.createLinearGradient(0,0,0,540);
+ sky.addColorStop(0,"#70c8f1");
+ sky.addColorStop(.58,"#c9eddb");
+ sky.addColorStop(1,"#8acb79");
+
+ ctx.fillStyle=sky;
+ ctx.fillRect(0,0,960,540);
+
+ // Sun glow
+ let glow=ctx.createRadialGradient(820,90,10,820,90,100);
+ glow.addColorStop(0,"rgba(255,245,180,.7)");
+ glow.addColorStop(1,"rgba(255,245,180,0)");
+ ctx.fillStyle=glow;
+ ctx.fillRect(700,0,240,200);
+
+ ctx.fillStyle="#ffeaa4";
+ ctx.beginPath();
+ ctx.arc(820,85,40,0,Math.PI*2);
+ ctx.fill();
+
+ // Moving clouds
+ for(let i=0;i<5;i++){
+  let x=((i*260-world*13)%1150+1150)%1150-100;
+  let y=65+(i%3)*45;
+
+  ctx.fillStyle="rgba(255,255,255,.82)";
+  ctx.beginPath();
+  ctx.arc(x,y,22,0,Math.PI*2);
+  ctx.arc(x+28,y-12,31,0,Math.PI*2);
+  ctx.arc(x+60,y,23,0,Math.PI*2);
+  ctx.fill();
+ }
+
+ // Distant hills: slow movement
+ ctx.fillStyle="#8acb91";
+ ctx.beginPath();
+ ctx.moveTo(0,300);
+ for(let x=0;x<=1000;x+=100){
+  let y=240+Math.sin((x+world*8)*.009)*40;
+  ctx.lineTo(x,y);
+ }
+ ctx.lineTo(960,400);
+ ctx.lineTo(0,400);
+ ctx.fill();
+
+ // Background trees
+ for(let i=0;i<8;i++){
+  let x=((i*180-world*35)%1250+1250)%1250-140;
+  let y=260;
+
+  ctx.fillStyle="#795438";
+  ctx.fillRect(x,y,17,100);
+
+  ctx.fillStyle="#27894e";
+  ctx.beginPath();
+  ctx.arc(x+8,y-20,42,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle="#43ad62";
+  ctx.beginPath();
+  ctx.arc(x-12,y-40,25,0,Math.PI*2);
+  ctx.fill();
+ }
+
+ // Ground
+ ctx.fillStyle="#5ca954";
+ ctx.fillRect(0,325,960,215);
+
+ // Moving bushes
+ for(let i=0;i<14;i++){
+  let x=((i*95-world*65)%1100+1100)%1100-80;
+  ctx.fillStyle=i%2?"#328b49":"#439c52";
+  ctx.beginPath();
+  ctx.arc(x,345,20,Math.PI,Math.PI*2);
+  ctx.fill();
+ }
+
+ // Road
+ ctx.fillStyle="#d9bd91";
+ ctx.fillRect(0,380,960,160);
+
+ ctx.strokeStyle="#f5e5c8";
+ ctx.lineWidth=5;
+ ctx.beginPath();
+ ctx.moveTo(0,382);
+ ctx.lineTo(960,382);
+ ctx.stroke();
+
+ // Moving road markings
+ ctx.fillStyle="#fff0d1";
+ for(let i=0;i<9;i++){
+  let x=((i*150-world*230)%1100+1100)%1100-100;
+  ctx.fillRect(x,455,65,7);
+ }
+
+ // Moving flowers
+ for(let i=0;i<18;i++){
+  let x=((i*75-world*95)%1100+1100)%1100-70;
+  let y=350+(i%3)*10;
+
+  ctx.fillStyle=i%2?"#ffdf73":"#ff9bc4";
+  ctx.beginPath();
+  ctx.arc(x,y,5,0,Math.PI*2);
+  ctx.fill();
+ }
+}
+
+// ---------------- CHARACTERS ----------------
+
+function drawCharacter(img,x,y,w,h,phase,rotation=0){
  ctx.save();
- ctx.globalAlpha=.22;
- ctx.fillStyle='#30251e';
- ctx.beginPath();ctx.ellipse(cx,baseY+2,obj.w*.48*(1+Math.abs(stride)*.08),9,0,0,Math.PI*2);ctx.fill();
- ctx.restore();
- ctx.save();
- ctx.translate(cx,baseY-bob);
- ctx.rotate(lean);
- const drawW=obj.w*(1+(ducking?-.03:Math.abs(runningBob)*.012));
- const drawH=obj.h*(1+(ducking?.02:-Math.abs(runningBob)*.012));
- if(ducking)ctx.translate(0,14);
- if(img.complete&&img.naturalWidth){
-   // Keep the real photo cutout, animate the whole sprite with a lively run cycle.
-   ctx.drawImage(img,-drawW/2,-drawH,drawW,drawH);
+ ctx.translate(x,y);
+
+ // Shadow
+ ctx.fillStyle="rgba(0,0,0,.2)";
+ ctx.beginPath();
+ ctx.ellipse(0,0,w*.34,10,0,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.rotate(rotation);
+
+ let bob=Math.sin(phase)*5;
+
+ if(img.complete && img.naturalWidth>0){
+  ctx.drawImage(img,-w/2,-h+bob,w,h);
  }else{
-   drawFallback(-drawW/2,-drawH,drawW,drawH,isGirl);
+  ctx.fillStyle=img===girl?"#ed75a8":"#4686d9";
+  ctx.fillRect(-w/2,-h+bob,w,h);
+  ctx.fillStyle="white";
+  ctx.font="bold 22px Arial";
+  ctx.textAlign="center";
+  ctx.fillText(img===girl?"GIRL":"BOY",0,-h/2+bob);
  }
- // Small speed streaks behind each runner.
- ctx.globalAlpha=.22+Math.abs(stride)*.12;
- ctx.strokeStyle=isGirl?'#ffd5e8':'#fff0d4';ctx.lineWidth=3;ctx.lineCap='round';
- for(let k=0;k<2;k++){let yy=-obj.h*(.38+k*.13)+Math.sin(t*.3+k)*3;ctx.beginPath();ctx.moveTo(-drawW*.72-k*8,yy);ctx.lineTo(-drawW*.98-k*10,yy-2);ctx.stroke()}
- ctx.globalAlpha=1;
- // Girl's broom swings back and forth as she runs; during the hit scene a separate animation is used.
- if(isGirl&&phase==='chase'){
-   const swing=Math.sin(t*.34)*.28;
-   ctx.save();ctx.translate(drawW*.25,-drawH*.48);ctx.rotate(-.55+swing);
-   ctx.strokeStyle='#80502d';ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(37,-55);ctx.stroke();
-   ctx.translate(37,-55);ctx.rotate(-.18);ctx.fillStyle='#d5a45b';ctx.beginPath();ctx.moveTo(-8,-5);ctx.lineTo(17,-16);ctx.lineTo(27,7);ctx.lineTo(0,14);ctx.closePath();ctx.fill();
-   ctx.strokeStyle='#9b6b3d';ctx.lineWidth=2;for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(i*5-5,3);ctx.lineTo(i*5-8,17);ctx.stroke()}ctx.restore();
- }
- // Bouquet and chocolate bounce with the boy's running motion.
- if(!isGirl&&phase==='chase'){
-   ctx.save();ctx.translate(drawW*.27,-drawH*.47+stride*3);ctx.rotate(-.12+stride*.08);
-   ctx.font='27px serif';ctx.textAlign='center';ctx.fillText('💐',0,0);ctx.font='23px serif';ctx.fillText('🍫',19,19);ctx.restore();
- }
+
  ctx.restore();
 }
-function drawLove(o){ctx.save();ctx.translate(o.x,o.y);ctx.font='38px serif';ctx.textAlign='center';ctx.fillText('💗',0,0);ctx.restore()}
-function drawObstacle(o){ctx.save();if(o.type==='box'){roundedRect(o.x,ground-54,48,54,5,'#9b633c','#f3c28b');ctx.fillStyle='#e8b66f';ctx.fillRect(o.x+8,ground-45,32,7)}else{ctx.fillStyle='#4a6b37';ctx.fillRect(o.x+18,ground-74,12,74);ctx.beginPath();ctx.arc(o.x+24,ground-82,34,0,Math.PI*2);ctx.fill()}ctx.restore()}
-function drawHitScene(){
- // short comedic broom beating scene
- ctx.fillStyle='#ffffff22';ctx.fillRect(0,0,W,H);
- ctx.save();ctx.translate(0,0);
- ctx.font='bold 38px sans-serif';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText('ধরা পড়েছো! 😂',W/2,95);
- // boy lies down
- if(boyImg.complete&&boyImg.naturalWidth){ctx.save();ctx.translate(620,ground-40);ctx.rotate(-.10);ctx.drawImage(boyImg,0,-85,145,125);ctx.restore()}else drawFallback(620,ground-120,120,120,false);
- // girl stands near him with broom swing
- if(girlImg.complete&&girlImg.naturalWidth)ctx.drawImage(girlImg,420,ground-150,110,150);else drawFallback(420,ground-150,110,150,true);
- let swing=Math.sin((3-hitTimer)*17)*.7;
- ctx.save();ctx.translate(525,ground-112);ctx.rotate(swing);ctx.strokeStyle='#8b572c';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(120,-85);ctx.stroke();ctx.fillStyle='#d8a85b';ctx.fillRect(105,-105,32,35);ctx.restore();
- ctx.font='34px serif';ctx.fillText('💥  💫  💥',650,ground-160);
+
+// ---------------- HEARTS ----------------
+
+function drawHeart(x,y){
+ ctx.save();
+ ctx.translate(x,y);
+ ctx.scale(1.1,1.1);
+
+ ctx.fillStyle="#ff347e";
+ ctx.beginPath();
+ ctx.moveTo(0,12);
+ ctx.bezierCurveTo(-45,-12,-25,-40,0,-19);
+ ctx.bezierCurveTo(25,-40,45,-12,0,12);
+ ctx.fill();
+
  ctx.restore();
 }
-function draw(){
- background();
- loves.forEach(drawLove);obstacles.forEach(drawObstacle);
- if(phase==='hit')drawHitScene();else{drawCharacter(girlImg,girl,true);drawCharacter(boyImg,boy,false)}
- particles.forEach(p=>{ctx.globalAlpha=Math.max(0,p.life/40);ctx.font='26px serif';ctx.fillText(p.text,p.x,p.y);ctx.globalAlpha=1});
- if(!running&&phase==='chase'){ctx.fillStyle='#25153699';ctx.fillRect(0,0,W,H)}
+
+// ---------------- PARTICLES ----------------
+
+function createParticles(x,y,color){
+ for(let i=0;i<14;i++){
+  particles.push({
+   x,y,
+   vx:(Math.random()-.5)*6,
+   vy:(Math.random()-.5)*6,
+   life:1,
+   size:Math.random()*5+2,
+   color
+  });
+ }
 }
-function beep(freq=600,dur=.09,type='sine',vol=.035){if(!audio)return;const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(vol,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+dur);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+dur)}
-function startMusic(){if(musicOn)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();audio.resume();musicOn=true;const notes=[392,494,587,494,440,523,659,523];musicTimer=setInterval(()=>{if(!running||phase==='hit')return;beep(notes[musicStep++%notes.length],.16,'triangle',.012)},230)}catch(e){}}
-function stopMusic(){musicOn=false;if(musicTimer)clearInterval(musicTimer)}
-function toast(msg){const el=$('toast');el.textContent=msg;el.style.opacity=1;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.opacity=0,1200)}
-function updateUI(){$('loveCount').textContent=love;$('roundCount').textContent=['১','২','৩','৪','৫','৬','৭','৮','৯','১০'][Math.min(round-1,9)]||round}
-function startGame(){if(started&&running)return;started=true;running=true;phase='chase';love=0;loves=[];obstacles=[];particles=[];spawn=0;obSpawn=0;girl.x=145;girl.y=ground-girl.h;girl.vy=0;girl.jumping=false;girl.duck=false;boy.x=700;$('overlay').classList.add('hidden');updateUI();startMusic();last=performance.now();requestAnimationFrame(loop)}
-function jump(){if(!running||phase!=='chase'||girl.jumping)return;girl.vy=-17;girl.jumping=true;beep(520,.12,'square',.025)}
-function duck(on){if(!running||phase!=='chase')return;girl.duck=on}
-function catchBoy(){phase='hit';hitTimer=3;love=15;girl.x=535;boy.x=650;updateUI();toast('ধরে ফেলেছে! ঝাড়ুর বাড়ি! 😂');beep(130,.35,'sawtooth',.07)}
-function finishHit(){phase='chase';round++;love=0;loves=[];obstacles=[];spawn=0;obSpawn=0;girl.x=145;boy.x=700;girl.y=ground-girl.h;girl.vy=0;girl.jumping=false;girl.duck=false;updateUI();toast('আবার দৌড় শুরু! 🏃💨');beep(740,.18,'triangle',.04)}
-function loop(now){if(!running)return;const dt=Math.min((now-last)/16.67,2);last=now;world+=5.3*dt;
- if(phase==='chase'){
-   girl.frame+=dt;boy.frame+=dt;
-   girl.x=145+(love/15)*370;
-   boy.x=700+Math.sin(world*.035)*5;
-   if(girl.jumping){girl.vy+=.78*dt;girl.y+=girl.vy*dt;if(girl.y>=ground-girl.h){girl.y=ground-girl.h;girl.vy=0;girl.jumping=false}}
-   const speed=6.0+Math.min(round*.25,2);
-   if(Math.sin(world*.34)>.96 && !girl.jumping)particles.push({x:girl.x+girl.w*.35,y:ground-5,life:14,text:'☁️'});
-   spawn-=dt;obSpawn-=dt;
-   if(spawn<=0){loves.push({x:W+20,y:ground-120-Math.random()*115});spawn=75+Math.random()*38}
-   if(obSpawn<=0){obstacles.push({x:W+30,type:Math.random()>.48?'box':'tree'});obSpawn=105+Math.random()*65}
-   loves.forEach(o=>o.x-=speed*dt);obstacles.forEach(o=>o.x-=speed*dt);
-   // Player girl collects hearts; collision depends on jumping/ducking
-   for(let i=loves.length-1;i>=0;i--){const o=loves[i];if(Math.abs(o.x-(girl.x+55))<48&&Math.abs(o.y-(girl.y+55))<85){loves.splice(i,1);love++;updateUI();particles.push({x:o.x,y:o.y,life:40,text:'💖'});beep(880,.11,'sine',.045);if(love>=15){catchBoy();break}}}
-   for(let i=obstacles.length-1;i>=0;i--){const o=obstacles[i];if(o.x<girl.x+girl.w*.8&&o.x+50>girl.x+15){let safe=girl.jumping||(girl.duck&&o.type==='tree');if(!safe){obstacles.splice(i,1);love=Math.max(0,love-1);updateUI();toast('বাধায় ধাক্কা! সাবধানে!');beep(180,.18,'square',.04)}else if(o.x<girl.x+25)obstacles.splice(i,1)}}
-   loves=loves.filter(o=>o.x>-60);obstacles=obstacles.filter(o=>o.x>-80);
-   particles.forEach(p=>{p.y-=1.4*dt;p.life-=dt});particles=particles.filter(p=>p.life>0).slice(-45);
- }else if(phase==='hit'){hitTimer-=dt;if(hitTimer<=0)finishHit()}
- draw();requestAnimationFrame(loop)}
-$('startBtn').addEventListener('click',startGame);
-$('jumpBtn').addEventListener('pointerdown',e=>{e.preventDefault();jump()});
-$('duckBtn').addEventListener('pointerdown',e=>{e.preventDefault();duck(true)});
-['pointerup','pointercancel','pointerleave'].forEach(ev=>$('duckBtn').addEventListener(ev,()=>duck(false)));
-window.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();jump()}if(e.code==='ArrowDown')duck(true)});
-window.addEventListener('keyup',e=>{if(e.code==='ArrowDown')duck(false)});
-async function rotateToLandscape(){
- const shell=$('gameShell');
- manualLandscape=false;
- try{
-   if(!document.fullscreenElement && shell.requestFullscreen) await shell.requestFullscreen();
-   if(screen.orientation && screen.orientation.lock) {
-     await screen.orientation.lock('landscape');
-     shell.classList.remove('manualRotate');
-   } else {
-     throw new Error('Orientation lock unavailable');
+
+function updateParticles(dt){
+ particles.forEach(p=>{
+  p.x+=p.vx;
+  p.y+=p.vy;
+  p.life-=dt*1.5;
+ });
+
+ particles=particles.filter(p=>p.life>0);
+}
+
+function drawParticles(){
+ particles.forEach(p=>{
+  ctx.globalAlpha=p.life;
+  ctx.fillStyle=p.color;
+  ctx.beginPath();
+  ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+  ctx.fill();
+  ctx.globalAlpha=1;
+ });
+}
+
+// ---------------- GAME LOGIC ----------------
+
+function catchBoy(){
+ if(attacking)return;
+
+ attacking=true;
+ totalCatches++;
+
+ // 3, 5, 7, 9, 11...
+ attackDuration=3+(totalCatches-1)*2;
+ attackStart=performance.now();
+
+ playCatch();
+ createParticles(550,250,"#ffcf48");
+
+ document.getElementById("info").textContent=
+ "🧹 ATTACK "+attackDuration+" SEC!";
+}
+
+function startGame(){
+ if(running)return;
+
+ running=true;
+ audioReady();
+
+ lastTime=performance.now();
+ nextHeart=performance.now()+1000;
+
+ document.getElementById("info").textContent="🏃 RUNNING!";
+
+ if(musicOn)startMusic();
+}
+
+function resetGame(){
+ running=false;
+ attacking=false;
+
+ stopMusic();
+
+ hearts=0;
+ totalCatches=0;
+ attackDuration=3;
+ heartActive=false;
+ particles=[];
+ frame=0;
+ world=0;
+
+ document.getElementById("info").textContent="READY!";
+}
+
+// ---------------- UPDATE ----------------
+
+function update(dt,now){
+ if(!running)return;
+
+ frame+=dt*9;
+
+ if(attacking){
+  let elapsed=(now-attackStart)/1000;
+
+  // Repeated broom-hit sound rhythm
+  if(elapsed<attackDuration &&
+     Math.floor(elapsed*2)!==Math.floor((elapsed-dt)*2)){
+   playBonk();
+   createParticles(570,240,"#ffdf61");
+  }
+
+  if(elapsed>=attackDuration){
+   attacking=false;
+   hearts=0;
+   heartActive=false;
+
+   playEscape();
+
+   document.getElementById("info").textContent="🏃 BOY ESCAPED!";
+  }
+  return;
+ }
+
+ // Heart spawning
+ if(!heartActive && now>=nextHeart){
+  heartActive=true;
+  heartX=960;
+  heartY=250+Math.random()*70;
+ }
+
+ if(heartActive){
+  heartX-=300*dt;
+
+  if(heartX<=girlX+45 && heartX>=girlX-65){
+   hearts++;
+   heartActive=false;
+   nextHeart=now+800;
+
+   playCollect();
+   createParticles(girlX,260,"#ff4d91");
+
+   if(hearts>=12){
+    catchBoy();
    }
- }catch(e){
-   // Browser may block orientation lock; use a visual landscape fallback.
-   manualLandscape=true;
-   shell.classList.add('manualRotate');
+  }
+
+  if(heartX<0){
+   heartActive=false;
+   nextHeart=now+500;
+  }
  }
- resizeNotice();
 }
-$('rotateBtn').addEventListener('click',rotateToLandscape);
-$('portraitRotateBtn').addEventListener('click',rotateToLandscape);
-document.addEventListener('fullscreenchange',()=>{setTimeout(resizeNotice,150);});
-draw();
-})();
+
+// ---------------- RENDER ----------------
+
+function render(now){
+ let dt=Math.min((now-lastTime)/1000,.04);
+ lastTime=now;
+
+ if(running)update(dt,now);
+ updateParticles(dt);
+
+ background(running?dt:0);
+
+ // Heart
+ if(heartActive && !attacking){
+  drawHeart(heartX,heartY);
+ }
+
+ if(attacking){
+  let elapsed=(now-attackStart)/1000;
+  let progress=elapsed/attackDuration;
+
+  // Boy flinches
+  let boyShake=Math.sin(elapsed*22)*10;
+  let boyRotation=Math.sin(elapsed*14)*.13;
+
+  drawCharacter(
+   boy,boyX+boyShake,370,115,180,frame,boyRotation
+  );
+
+  // Girl uses broom already present in her picture
+  let swing=Math.sin(elapsed*18)*.32;
+  let recoil=Math.sin(elapsed*30)*.045;
+
+  drawCharacter(
+   girl,480,370,125,190,
+   frame+elapsed*5,swing+recoil
+  );
+
+  ctx.fillStyle="#ffdf61";
+  ctx.font="bold 32px Arial";
+  ctx.textAlign="center";
+  ctx.fillText("BONK! 💥",550,145);
+
+  // Attack timer
+  ctx.fillStyle="rgba(0,0,0,.35)";
+  ctx.fillRect(350,45,260,17);
+
+  ctx.fillStyle="#ff69a7";
+  ctx.fillRect(
+   350,45,
+   260*Math.max(0,1-progress),17
+  );
+
+  ctx.fillStyle="white";
+  ctx.font="bold 20px Arial";
+  ctx.fillText(
+   Math.max(0,attackDuration-elapsed).toFixed(1)+" SEC",
+   480,32
+  );
+
+ }else{
+  drawCharacter(boy,boyX,370,115,180,frame);
+  drawCharacter(girl,girlX,370,125,190,frame);
+ }
+
+ drawParticles();
+
+ // Score
+ ctx.textAlign="left";
+ ctx.font="bold 24px Arial";
+ ctx.fillStyle="white";
+ ctx.fillText("❤️ LOVE: "+hearts+"/12",25,45);
+
+ ctx.font="17px Arial";
+ ctx.fillText("CATCH: "+totalCatches,25,75);
+
+ requestAnimationFrame(render);
+}
+
+requestAnimationFrame(render);
 </script>
+
 </body>
 </html>
