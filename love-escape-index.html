@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#130d24">
+<title>LOVE ESCAPE ❤️</title>
+<style>
+:root{--pink:#ff6da9;--purple:#241737;--cream:#fff2e5}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#100b1e;color:white;font-family:system-ui,"Noto Sans Bengali",sans-serif;touch-action:none}
+#gameShell{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 20%,#342047,#100b1e 75%);overflow:hidden}
+#stage{position:relative;width:min(100vw,177.777vh);height:min(100vh,56.25vw);aspect-ratio:16/9;display:flex;flex-direction:column;gap:8px;padding:10px 14px 12px}
+#topbar{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{font-size:clamp(15px,2.8vw,25px);font-weight:900;letter-spacing:1px;color:#ff86b8;text-shadow:0 2px 15px #ff4b9c55}
+.stats{display:flex;gap:8px;align-items:center}
+.pill{background:#ffffff17;border:1px solid #ffffff24;border-radius:30px;padding:6px 13px;font-weight:800;font-size:clamp(11px,1.8vw,16px);white-space:nowrap}
+#canvasWrap{position:relative;flex:1;min-height:0;border:4px solid #9e628f;border-radius:20px;overflow:hidden;background:#8dd4df;box-shadow:0 0 0 2px #ffffff1c,0 12px 35px #0008}
+canvas{display:block;width:100%;height:100%}
+#controls{height:clamp(48px,11vh,76px);flex:none;display:flex;align-items:stretch;justify-content:center;gap:12px}
+.control{flex:1;max-width:240px;border:2px solid #a778a4;border-radius:18px;background:linear-gradient(145deg,#493054,#2b1d3d);color:white;font-size:clamp(14px,2.4vw,21px);font-weight:900;letter-spacing:1px;box-shadow:0 5px 0 #171023;touch-action:none}
+.control:active{transform:translateY(3px);box-shadow:0 2px 0 #171023;background:#68416b}
+#hint{height:18px;flex:none;text-align:center;color:#d5c4dc;font-size:clamp(9px,1.6vw,13px);white-space:nowrap}
+#rotateBtn{position:absolute;right:14px;top:58px;z-index:5;border:1px solid #ffffff55;border-radius:30px;background:#1c142dcc;color:white;padding:7px 12px;font-weight:800;font-size:12px}
+#overlay{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;background:#10091dcc;padding:14px}
+.panel{width:min(560px,94%);max-height:95%;overflow:auto;text-align:center;border:2px solid #b879a9;border-radius:22px;background:linear-gradient(145deg,#392344f5,#21152ff5);padding:clamp(12px,3vw,26px);box-shadow:0 18px 50px #0008}
+.panel h1{margin:0 0 8px;color:#ff8dbb;font-size:clamp(22px,5vw,42px)}
+.panel p{margin:8px 0;color:#fff0f7;font-size:clamp(12px,2vw,17px);line-height:1.6}
+.mainBtn{border:0;border-radius:30px;background:linear-gradient(90deg,#ff5b9e,#ff9bc3);color:#48182f;padding:12px 28px;font-weight:1000;font-size:clamp(14px,2.4vw,20px);margin-top:8px}
+#toast{position:absolute;left:50%;top:18%;transform:translateX(-50%);z-index:3;background:#24152fe8;border:1px solid #ff9ac7;border-radius:25px;padding:8px 16px;font-weight:900;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
+.hidden{display:none!important}
+#portraitNotice{display:none;position:fixed;inset:0;z-index:20;background:#100b1e;color:white;align-items:center;justify-content:center;text-align:center;padding:28px}
+#portraitNotice .box{max-width:360px}
+@media (orientation:portrait) and (max-width:700px){
+  #stage{width:100vw;height:100vh;aspect-ratio:auto;padding:8px}
+  #canvasWrap{min-height:0}
+}
+#gameShell.manualRotate #stage{position:absolute;width:100vh;height:100vw;max-width:none;max-height:none;transform:rotate(90deg);transform-origin:center center}
+#gameShell.manualRotate{overflow:hidden}
+@media (max-height:380px){#stage{padding:5px 9px;gap:4px}#topbar{height:30px}#controls{height:42px}#hint{height:12px}#rotateBtn{top:39px}}
+</style>
+</head>
+<body>
+<div id="gameShell">
+  <div id="stage">
+    <div id="topbar">
+      <div class="brand">LOVE ESCAPE ❤️</div>
+      <div class="stats">
+        <div class="pill">💗 <span id="loveCount">0</span>/15</div>
+        <div class="pill">🏃 <span id="roundCount">১</span> রাউন্ড</div>
+      </div>
+    </div>
+    <button id="rotateBtn" type="button">⟳ ROTATE / FULLSCREEN</button>
+    <div id="canvasWrap"><canvas id="game" width="960" height="540"></canvas><div id="toast"></div>
+      <div id="overlay">
+        <div class="panel">
+          <h1>LOVE ESCAPE! 💘</h1>
+          <p>ছেলেটা ফুল আর চকোলেট নিয়ে পালাচ্ছে! 🌹🍫<br>মেয়ে পেছন থেকে ঝাড়ু হাতে ধাওয়া করছে! 😂</p>
+          <p><b>তুমি মেয়েকে নিয়ন্ত্রণ করবে।</b><br>১৫টি Love সংগ্রহ করলেই ধরে ফেলবে। তারপর ৩ সেকেন্ড ঝাড়ু দিয়ে পিটুনি! 😄</p>
+          <button class="mainBtn" id="startBtn">খেলা শুরু করো ❤️</button>
+        </div>
+      </div>
+    </div>
+    <div id="controls">
+      <button class="control" id="jumpBtn">⬆ JUMP</button>
+      <button class="control" id="duckBtn">⬇ DUCK</button>
+    </div>
+    <div id="hint">মেয়েকে নিয়ন্ত্রণ করো • Jump = লাফ • Duck = নিচু হও • ১৫টি Love সংগ্রহ করো</div>
+  </div>
+</div>
+<div id="portraitNotice"><div class="box"><div style="font-size:54px">📱 ↻</div><h2>ফোনটি আড়াআড়ি করো</h2><p>আরও বড় স্ক্রিনে খেলার জন্য Rotate বাটন চাপো, অথবা ফোন Landscape করো।</p></div></div>
+<script>
+(()=>{
+'use strict';
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+const W=960,H=540,ground=435;
+const boyImg=new Image(),girlImg=new Image();
+boyImg.src='boy.png';girlImg.src='girl.png';
+let running=false,started=false,phase='chase',love=0,round=1,world=0,last=0,spawn=0,obSpawn=0,hitTimer=0,toastTimer=0;
+let musicOn=false,audio=null,musicTimer=null,musicStep=0;
+const girl={x:170,y:ground-140,w:100,h:140,vy:0,jumping:false,duck:false,frame:0};
+const boy={x:670,y:ground-142,w:105,h:142,frame:0};
+let loves=[],obstacles=[],particles=[];
+const $=id=>document.getElementById(id);
+function fit(){ /* canvas uses a fixed logical landscape size and scales via CSS */ }
+function resizeNotice(){const portrait=innerHeight>innerWidth && innerWidth<700; $('portraitNotice').style.display=portrait?'flex':'none';}
+window.addEventListener('resize',resizeNotice);resizeNotice();
+function roundedRect(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}}
+function drawCloud(x,y,s){ctx.fillStyle='#ffffffa8';ctx.beginPath();ctx.arc(x,y,24*s,0,Math.PI*2);ctx.arc(x+25*s,y-10*s,30*s,0,Math.PI*2);ctx.arc(x+55*s,y,22*s,0,Math.PI*2);ctx.fill()}
+function drawTree(x,y,s){ctx.fillStyle='#76503b';ctx.fillRect(x-7*s,y,14*s,90*s);ctx.fillStyle='#26794f';ctx.beginPath();ctx.arc(x,y-12*s,42*s,0,Math.PI*2);ctx.arc(x-22*s,y+2*s,28*s,0,Math.PI*2);ctx.arc(x+25*s,y+3*s,28*s,0,Math.PI*2);ctx.fill();ctx.fillStyle='#49a66d';ctx.beginPath();ctx.arc(x-13*s,y-25*s,15*s,0,Math.PI*2);ctx.fill()}
+function background(){
+ const t=world;
+ const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#70c8e5');sky.addColorStop(.68,'#d6f0dc');sky.addColorStop(1,'#e8c39e');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+ ctx.fillStyle='#fff0a6';ctx.beginPath();ctx.arc(805,92,48,0,Math.PI*2);ctx.fill();
+ drawCloud(130-(t*.12%1150),100,.9);drawCloud(550-(t*.08%1100),145,.7);drawCloud(930-(t*.1%1100),80,.8);
+ ctx.fillStyle='#8abda0';ctx.beginPath();ctx.moveTo(0,330);for(let x=0;x<=W;x+=80)ctx.lineTo(x,300+Math.sin((x+t*.12)*.008)*23);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();
+ for(let i=0;i<7;i++){let x=((i*175-t*.32)%(W+200)+W+200)%(W+200)-80;drawTree(x,340,1.05)}
+ ctx.fillStyle='#9b6b53';ctx.fillRect(0,ground,W,H-ground);
+ ctx.fillStyle='#d89d77';ctx.fillRect(0,ground,W,10);
+ ctx.strokeStyle='#714a42';ctx.lineWidth=4;ctx.setLineDash([48,38]);ctx.lineDashOffset=-t*.9;ctx.beginPath();ctx.moveTo(0,490);ctx.lineTo(W,490);ctx.stroke();ctx.setLineDash([]);
+ // roadside flower bushes
+ for(let i=0;i<10;i++){let x=((i*120-t*.7)%(W+100)+W+100)%(W+100);ctx.fillStyle=i%2?'#398c58':'#4c9e5e';ctx.beginPath();ctx.arc(x,425,13,0,Math.PI*2);ctx.fill()}
+}
+function drawFallback(x,y,w,h,isGirl){
+ ctx.save();ctx.translate(x,y);ctx.fillStyle=isGirl?'#126b4b':'#394b65';ctx.beginPath();ctx.arc(w*.5,20,w*.18,0,Math.PI*2);ctx.fill();ctx.fillRect(w*.3,40,w*.4,h*.48);ctx.strokeStyle='#222';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(w*.4,h*.48);ctx.lineTo(w*.25,h*.9);ctx.moveTo(w*.6,h*.48);ctx.lineTo(w*.75,h*.9);ctx.stroke();ctx.restore();
+}
+function drawCharacter(img,obj,isGirl){
+ ctx.save();
+ // both characters face right; mirror only if the source portrait is reversed
+ if(img.complete&&img.naturalWidth){
+   ctx.drawImage(img,obj.x,obj.y,obj.w,obj.h);
+ }else drawFallback(obj.x,obj.y,obj.w,obj.h,isGirl);
+ if(isGirl && phase==='chase'){
+   // broom held by the girl, clearly visible
+   ctx.strokeStyle='#8c572d';ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(obj.x+obj.w*.82,obj.y+obj.h*.34);ctx.lineTo(obj.x+obj.w*1.12,obj.y+obj.h*.05);ctx.stroke();
+   ctx.fillStyle='#d8a85b';ctx.beginPath();ctx.moveTo(obj.x+obj.w*1.03,obj.y+obj.h*.02);ctx.lineTo(obj.x+obj.w*1.34,obj.y-obj.h*.12);ctx.lineTo(obj.x+obj.w*1.28,obj.y+obj.h*.12);ctx.closePath();ctx.fill();
+ }
+ if(!isGirl && phase==='chase'){
+   // flowers and chocolate in the boy's hands
+   ctx.font='27px serif';ctx.fillText('💐🍫',obj.x+obj.w*.52,obj.y+obj.h*.48);
+ }
+ ctx.restore();
+}
+function drawLove(o){ctx.save();ctx.translate(o.x,o.y);ctx.font='38px serif';ctx.textAlign='center';ctx.fillText('💗',0,0);ctx.restore()}
+function drawObstacle(o){ctx.save();if(o.type==='box'){roundedRect(o.x,ground-54,48,54,5,'#9b633c','#f3c28b');ctx.fillStyle='#e8b66f';ctx.fillRect(o.x+8,ground-45,32,7)}else{ctx.fillStyle='#4a6b37';ctx.fillRect(o.x+18,ground-74,12,74);ctx.beginPath();ctx.arc(o.x+24,ground-82,34,0,Math.PI*2);ctx.fill()}ctx.restore()}
+function drawHitScene(){
+ // short comedic broom beating scene
+ ctx.fillStyle='#ffffff22';ctx.fillRect(0,0,W,H);
+ ctx.save();ctx.translate(0,0);
+ ctx.font='bold 38px sans-serif';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText('ধরা পড়েছো! 😂',W/2,95);
+ // boy lies down
+ if(boyImg.complete&&boyImg.naturalWidth){ctx.save();ctx.translate(620,ground-40);ctx.rotate(-.10);ctx.drawImage(boyImg,0,-85,145,125);ctx.restore()}else drawFallback(620,ground-120,120,120,false);
+ // girl stands near him with broom swing
+ if(girlImg.complete&&girlImg.naturalWidth)ctx.drawImage(girlImg,420,ground-150,110,150);else drawFallback(420,ground-150,110,150,true);
+ let swing=Math.sin((3-hitTimer)*17)*.7;
+ ctx.save();ctx.translate(525,ground-112);ctx.rotate(swing);ctx.strokeStyle='#8b572c';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(120,-85);ctx.stroke();ctx.fillStyle='#d8a85b';ctx.fillRect(105,-105,32,35);ctx.restore();
+ ctx.font='34px serif';ctx.fillText('💥  💫  💥',650,ground-160);
+ ctx.restore();
+}
+function draw(){
+ background();
+ loves.forEach(drawLove);obstacles.forEach(drawObstacle);
+ if(phase==='hit')drawHitScene();else{drawCharacter(girlImg,girl,true);drawCharacter(boyImg,boy,false)}
+ particles.forEach(p=>{ctx.globalAlpha=Math.max(0,p.life/40);ctx.font='26px serif';ctx.fillText(p.text,p.x,p.y);ctx.globalAlpha=1});
+ if(!running&&phase==='chase'){ctx.fillStyle='#25153699';ctx.fillRect(0,0,W,H)}
+}
+function beep(freq=600,dur=.09,type='sine',vol=.035){if(!audio)return;const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(vol,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+dur);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+dur)}
+function startMusic(){if(musicOn)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();audio.resume();musicOn=true;const notes=[392,494,587,494,440,523,659,523];musicTimer=setInterval(()=>{if(!running||phase==='hit')return;beep(notes[musicStep++%notes.length],.16,'triangle',.012)},230)}catch(e){}}
+function stopMusic(){musicOn=false;if(musicTimer)clearInterval(musicTimer)}
+function toast(msg){const el=$('toast');el.textContent=msg;el.style.opacity=1;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.opacity=0,1200)}
+function updateUI(){$('loveCount').textContent=love;$('roundCount').textContent=['১','২','৩','৪','৫','৬','৭','৮','৯','১০'][Math.min(round-1,9)]||round}
+function startGame(){if(started&&running)return;started=true;running=true;phase='chase';love=0;loves=[];obstacles=[];particles=[];spawn=0;obSpawn=0;girl.y=ground-girl.h;girl.vy=0;girl.jumping=false;girl.duck=false;boy.x=670;$('overlay').classList.add('hidden');updateUI();startMusic();last=performance.now();requestAnimationFrame(loop)}
+function jump(){if(!running||phase!=='chase'||girl.jumping)return;girl.vy=-17;girl.jumping=true;beep(520,.12,'square',.025)}
+function duck(on){if(!running||phase!=='chase')return;girl.duck=on}
+function catchBoy(){phase='hit';hitTimer=3;love=15;updateUI();toast('ধরে ফেলেছে! ঝাড়ুর বাড়ি! 😂');beep(130,.35,'sawtooth',.07)}
+function finishHit(){phase='chase';round++;love=0;loves=[];obstacles=[];spawn=0;obSpawn=0;girl.x=170;boy.x=700;girl.y=ground-girl.h;girl.vy=0;girl.jumping=false;girl.duck=false;updateUI();toast('আবার দৌড় শুরু! 🏃💨');beep(740,.18,'triangle',.04)}
+function loop(now){if(!running)return;const dt=Math.min((now-last)/16.67,2);last=now;world+=5.3*dt;
+ if(phase==='chase'){
+   girl.frame+=dt;boy.frame+=dt;
+   if(girl.jumping){girl.vy+=.78*dt;girl.y+=girl.vy*dt;if(girl.y>=ground-girl.h){girl.y=ground-girl.h;girl.vy=0;girl.jumping=false}}
+   const speed=5.2+Math.min(round*.25,2);
+   spawn-=dt;obSpawn-=dt;
+   if(spawn<=0){loves.push({x:W+20,y:ground-120-Math.random()*115});spawn=75+Math.random()*38}
+   if(obSpawn<=0){obstacles.push({x:W+30,type:Math.random()>.48?'box':'tree'});obSpawn=105+Math.random()*65}
+   loves.forEach(o=>o.x-=speed*dt);obstacles.forEach(o=>o.x-=speed*dt);
+   // Player girl collects hearts; collision depends on jumping/ducking
+   for(let i=loves.length-1;i>=0;i--){const o=loves[i];if(Math.abs(o.x-(girl.x+55))<48&&Math.abs(o.y-(girl.y+55))<85){loves.splice(i,1);love++;updateUI();particles.push({x:o.x,y:o.y,life:40,text:'💖'});beep(880,.11,'sine',.045);if(love>=15){catchBoy();break}}}
+   for(let i=obstacles.length-1;i>=0;i--){const o=obstacles[i];if(o.x<girl.x+girl.w*.8&&o.x+50>girl.x+15){let safe=girl.jumping||(girl.duck&&o.type==='tree');if(!safe){obstacles.splice(i,1);love=Math.max(0,love-1);updateUI();toast('বাধায় ধাক্কা! সাবধানে!');beep(180,.18,'square',.04)}else if(o.x<girl.x+25)obstacles.splice(i,1)}}
+   loves=loves.filter(o=>o.x>-60);obstacles=obstacles.filter(o=>o.x>-80);
+   particles.forEach(p=>{p.y-=1.4*dt;p.life-=dt});particles=particles.filter(p=>p.life>0);
+ }else if(phase==='hit'){hitTimer-=dt;if(hitTimer<=0)finishHit()}
+ draw();requestAnimationFrame(loop)}
+$('startBtn').addEventListener('click',startGame);
+$('jumpBtn').addEventListener('pointerdown',e=>{e.preventDefault();jump()});
+$('duckBtn').addEventListener('pointerdown',e=>{e.preventDefault();duck(true)});
+['pointerup','pointercancel','pointerleave'].forEach(ev=>$('duckBtn').addEventListener(ev,()=>duck(false)));
+window.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();jump()}if(e.code==='ArrowDown')duck(true)});
+window.addEventListener('keyup',e=>{if(e.code==='ArrowDown')duck(false)});
+$('rotateBtn').addEventListener('click',async()=>{
+ const shell=$('gameShell');
+ try{if(!document.fullscreenElement)await shell.requestFullscreen();if(screen.orientation&&screen.orientation.lock)await screen.orientation.lock('landscape');shell.classList.remove('manualRotate');}
+ catch(e){shell.classList.toggle('manualRotate');}
+});
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&screen.orientation?.unlock)screen.orientation.unlock();});
+draw();
+})();
+</script>
+</body>
+</html>
