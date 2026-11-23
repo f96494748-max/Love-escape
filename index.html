@@ -1,0 +1,611 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>LOVE ESCAPE ❤️</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  background:#171326;
+  color:white;
+  font-family:Arial,sans-serif;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+}
+
+.game-container{
+  width:100%;
+  max-width:1000px;
+  padding:10px;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.header h1{
+  color:#ff82b5;
+  font-size:clamp(20px,5vw,32px);
+}
+
+.stats{
+  display:flex;
+  gap:8px;
+}
+
+.stat{
+  background:#302541;
+  padding:8px 12px;
+  border-radius:20px;
+  font-size:14px;
+}
+
+.game-box{
+  position:relative;
+  width:100%;
+  overflow:hidden;
+  border:3px solid #875477;
+  border-radius:16px;
+  background:#9bd9e8;
+}
+
+canvas{
+  display:block;
+  width:100%;
+  height:auto;
+  touch-action:none;
+}
+
+.overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:15px;
+  background:#160d27c9;
+}
+
+.panel{
+  background:#2b1c3b;
+  border:1px solid #a65e91;
+  border-radius:20px;
+  padding:22px;
+  width:min(100%,430px);
+}
+
+.panel h2{
+  color:#ff9fc8;
+  font-size:30px;
+  margin-bottom:12px;
+}
+
+.panel p{
+  line-height:1.7;
+  margin-bottom:18px;
+}
+
+button{
+  border:0;
+  padding:13px 25px;
+  border-radius:30px;
+  background:linear-gradient(135deg,#ff579d,#ffb1ca);
+  color:#43152c;
+  font-weight:bold;
+  font-size:17px;
+}
+
+.controls{
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  margin-top:13px;
+}
+
+.controls button{
+  width:45%;
+  background:#38294a;
+  color:white;
+  border:1px solid #986c9a;
+}
+
+.hint{
+  text-align:center;
+  color:#c9b9d4;
+  font-size:12px;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game-container">
+
+  <div class="header">
+    <h1>LOVE ESCAPE ❤️</h1>
+
+    <div class="stats">
+      <div class="stat">❤️ <span id="score">0</span></div>
+      <div class="stat">দূরত্ব <span id="distance">0</span>%</div>
+    </div>
+  </div>
+
+  <div class="game-box">
+
+    <canvas id="game" width="960" height="540"></canvas>
+
+    <div class="overlay" id="overlay">
+      <div class="panel">
+        <h2>LOVE ESCAPE! 💘</h2>
+        <p>
+          ফুল আর চকলেট নিয়ে পালাও! 🌹🍫<br>
+          পেছনে ঝাড়ু হাতে সে আসছে! 😂<br>
+          হার্ট সংগ্রহ করো এবং বাধা এড়িয়ে দৌড়াও।
+        </p>
+        <button onclick="startGame()">খেলা শুরু করো ❤️</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button id="jumpBtn">⬆ JUMP</button>
+    <button id="duckBtn">⬇ DUCK</button>
+  </div>
+
+  <div class="hint">
+    মোবাইলে বাটনে চাপ দাও | কম্পিউটারে Space = Jump
+  </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const scoreText = document.getElementById("score");
+const distanceText = document.getElementById("distance");
+const overlay = document.getElementById("overlay");
+
+const boyImg = new Image();
+const girlImg = new Image();
+
+boyImg.src = "boy.png";
+girlImg.src = "girl.png";
+
+let running = false;
+let frame = 0;
+let score = 0;
+let distance = 0;
+let speed = 5;
+
+let player = {
+  x:170,
+  y:340,
+  w:145,
+  h:165,
+  velocity:0,
+  jumping:false,
+  ducking:false
+};
+
+let girlfriend = {
+  x:15,
+  y:335,
+  w:135,
+  h:170
+};
+
+let obstacles = [];
+let hearts = [];
+
+const ground = 455;
+
+function drawBackground(){
+
+  let sky = ctx.createLinearGradient(0,0,0,540);
+  sky.addColorStop(0,"#83d4ef");
+  sky.addColorStop(1,"#ffe0c1");
+
+  ctx.fillStyle = sky;
+  ctx.fillRect(0,0,960,540);
+
+  // Sun
+  ctx.fillStyle="#fff1b5";
+  ctx.beginPath();
+  ctx.arc(790,100,48,0,Math.PI*2);
+  ctx.fill();
+
+  // Distant hills
+  ctx.fillStyle="#83b99a";
+  ctx.beginPath();
+  ctx.moveTo(0,350);
+  ctx.quadraticCurveTo(220,190,440,350);
+  ctx.quadraticCurveTo(700,180,960,340);
+  ctx.lineTo(960,455);
+  ctx.lineTo(0,455);
+  ctx.fill();
+
+  // Trees
+  for(let i=0;i<9;i++){
+    let x=((i*160-frame*0.7)%1100+1100)%1100-80;
+
+    ctx.fillStyle="#73523d";
+    ctx.fillRect(x+22,320,15,110);
+
+    ctx.fillStyle="#347e54";
+    ctx.beginPath();
+    ctx.arc(x+30,300,45,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle="#4b9862";
+    ctx.beginPath();
+    ctx.arc(x+5,280,25,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  // Road
+  ctx.fillStyle="#d9a17c";
+  ctx.fillRect(0,ground,960,85);
+
+  ctx.fillStyle="#f4c49e";
+  ctx.fillRect(0,ground,960,7);
+
+  ctx.strokeStyle="#b97d62";
+  ctx.lineWidth=3;
+
+  for(let x=-(frame*speed%100);x<1000;x+=100){
+    ctx.beginPath();
+    ctx.moveTo(x,510);
+    ctx.lineTo(x+45,510);
+    ctx.stroke();
+  }
+}
+
+function drawCharacter(img,x,y,w,h,flip=false){
+
+  if(img.complete && img.naturalWidth>0){
+
+    ctx.save();
+
+    if(flip){
+      ctx.translate(x+w,y);
+      ctx.scale(-1,1);
+      ctx.drawImage(img,0,0,w,h);
+    }else{
+      ctx.drawImage(img,x,y,w,h);
+    }
+
+    ctx.restore();
+
+  }else{
+
+    // Temporary character until photo files are uploaded
+    ctx.fillStyle=img===boyImg?"#4c815f":"#267d59";
+    ctx.beginPath();
+    ctx.arc(x+w/2,y+30,27,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle="#f0bd99";
+    ctx.fillRect(x+w/2-22,y+55,44,55);
+
+    ctx.fillStyle=img===boyImg?"#34425a":"#17664b";
+    ctx.fillRect(x+25,y+100,w-50,60);
+
+    ctx.fillStyle="#ffffff";
+    ctx.font="30px Arial";
+    ctx.fillText(img===boyImg?"🏃":"🧹",x+45,y+45);
+  }
+}
+
+function drawDecorations(){
+
+  // Flowers and chocolate in player's hands
+  ctx.font="29px Arial";
+  ctx.fillText("💐",player.x+95,player.y+45);
+  ctx.fillText("🍫",player.x+115,player.y+80);
+}
+
+function createObstacle(){
+
+  let type=Math.random()<0.5?"box":"cone";
+
+  obstacles.push({
+    x:1000,
+    type:type
+  });
+
+  if(Math.random()<0.9){
+
+    hearts.push({
+      x:1080,
+      y:280+Math.random()*80,
+      taken:false
+    });
+
+  }
+}
+
+function drawObstacle(o){
+
+  if(o.type==="box"){
+
+    ctx.fillStyle="#93613d";
+    ctx.fillRect(o.x,ground-45,48,45);
+
+    ctx.fillStyle="#d7a15c";
+    ctx.fillRect(o.x+8,ground-37,32,7);
+
+  }else{
+
+    ctx.fillStyle="#f07848";
+
+    ctx.beginPath();
+    ctx.moveTo(o.x,ground);
+    ctx.lineTo(o.x+22,ground-48);
+    ctx.lineTo(o.x+44,ground);
+    ctx.fill();
+
+  }
+}
+
+function drawHeart(h){
+
+  ctx.font="32px Arial";
+  ctx.fillText("❤️",h.x,h.y);
+
+}
+
+function jump(){
+
+  if(running && !player.jumping){
+
+    player.velocity=-17;
+    player.jumping=true;
+
+  }
+
+}
+
+function update(){
+
+  frame++;
+
+  distance+=0.12;
+
+  if(distance>100){
+    distance=100;
+  }
+
+  speed=5+distance/35;
+
+  if(player.jumping){
+
+    player.y+=player.velocity;
+    player.velocity+=0.8;
+
+    if(player.y>=340){
+      player.y=340;
+      player.velocity=0;
+      player.jumping=false;
+    }
+
+  }
+
+  // Girlfriend gradually catches up
+  girlfriend.x+=0.035;
+
+  if(frame%95===0){
+    createObstacle();
+  }
+
+  obstacles.forEach(o=>{
+    o.x-=speed;
+  });
+
+  hearts.forEach(h=>{
+    h.x-=speed;
+  });
+
+  obstacles=obstacles.filter(o=>o.x>-100);
+
+  hearts=hearts.filter(h=>h.x>-50 && !h.taken);
+
+  // Heart collection
+  hearts.forEach(h=>{
+
+    if(
+      Math.abs(h.x-(player.x+70))<45 &&
+      Math.abs(h.y-(player.y+70))<55
+    ){
+
+      h.taken=true;
+      score++;
+      scoreText.textContent=score;
+
+    }
+
+  });
+
+  // Collision
+  obstacles.forEach(o=>{
+
+    let playerBottom=player.ducking?player.y+120:player.y+160;
+
+    if(
+      o.x<player.x+115 &&
+      o.x+45>player.x+35 &&
+      playerBottom>ground-40 &&
+      player.y+60<ground
+    ){
+
+      distance=Math.max(0,distance-5);
+
+    }
+
+  });
+
+  // Catch ending
+  if(girlfriend.x>player.x-85 || distance>=100){
+    romanticEnding();
+  }
+
+  distanceText.textContent=Math.floor(distance);
+
+}
+
+function render(){
+
+  drawBackground();
+
+  hearts.forEach(drawHeart);
+  obstacles.forEach(drawObstacle);
+
+  let playerHeight=player.ducking?120:165;
+  let playerY=player.ducking?375:player.y;
+
+  drawCharacter(
+    girlImg,
+    girlfriend.x,
+    girlfriend.y,
+    girlfriend.w,
+    girlfriend.h
+  );
+
+  drawCharacter(
+    boyImg,
+    player.x,
+    playerY,
+    player.w,
+    playerHeight
+  );
+
+  drawDecorations();
+
+}
+
+function gameLoop(){
+
+  if(!running)return;
+
+  update();
+  render();
+
+  requestAnimationFrame(gameLoop);
+
+}
+
+function startGame(){
+
+  score=0;
+  distance=0;
+  speed=5;
+  frame=0;
+
+  obstacles=[];
+  hearts=[];
+
+  player.y=340;
+  player.velocity=0;
+  player.jumping=false;
+  player.ducking=false;
+
+  girlfriend.x=15;
+
+  scoreText.textContent=0;
+  distanceText.textContent=0;
+
+  overlay.style.display="none";
+
+  running=true;
+
+  gameLoop();
+
+}
+
+function romanticEnding(){
+
+  if(!running)return;
+
+  running=false;
+
+  overlay.innerHTML=`
+    <div class="panel">
+      <h2>ধরা পড়ে গেলে! 🥰</h2>
+      <p>
+        অবশেষে সে তোমাকে ধরে ফেলেছে! 😂<br><br>
+        তুমি ফুল আর চকলেট এগিয়ে দিলে।<br>
+        তার রাগ গলে গেল ভালোবাসায়। ❤️<br><br>
+        <b>“তুমি আমার সবচেয়ে প্রিয় মানুষ।”</b><br><br>
+        সংগৃহীত হার্ট: ${score}
+      </p>
+      <button onclick="startGame()">আবার খেলো ❤️</button>
+    </div>
+  `;
+
+  overlay.style.display="flex";
+
+}
+
+// Mobile controls
+document.getElementById("jumpBtn").addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  jump();
+});
+
+const duckBtn=document.getElementById("duckBtn");
+
+duckBtn.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  player.ducking=true;
+});
+
+["pointerup","pointercancel","pointerleave"].forEach(event=>{
+  duckBtn.addEventListener(event,()=>{
+    player.ducking=false;
+  });
+});
+
+// Keyboard controls
+window.addEventListener("keydown",e=>{
+
+  if(e.code==="Space" || e.code==="ArrowUp"){
+    e.preventDefault();
+    jump();
+  }
+
+  if(e.code==="ArrowDown"){
+    player.ducking=true;
+  }
+
+});
+
+window.addEventListener("keyup",e=>{
+
+  if(e.code==="ArrowDown"){
+    player.ducking=false;
+  }
+
+});
+
+render();
+
+</script>
+</body>
+</html>
